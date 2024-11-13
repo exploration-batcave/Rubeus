@@ -42,14 +42,14 @@ jobs:
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: |
-       msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform="Any CPU" ${{env.SOLUTION_FILE_PATH}} /p:OutDir=${{env.GITHUB_WORKSPACE}}/compiled/
+       msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform="Any CPU" ${{env.SOLUTION_FILE_PATH}} /p:OutDir=compiled/
 
     - name: Package Stuff
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: |
-        cd compiled
+        cd ${{env.GITHUB_WORKSPACE}}/compiled
         ls
-        tar.exe -czvf ..\${{env.NAME_BATGADGET}}.tar.gz .
+        tar.exe -czvf ..\..\${{env.NAME_BATGADGET}}.tar.gz .
 
     - name: Create Release
       id: create_release
