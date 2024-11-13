@@ -20,9 +20,6 @@ env:
 
   NAME_BATGADGET: Rubeus
 
-permissions:
-  contents: read
-
 jobs:
   build:
     runs-on: windows-2019
