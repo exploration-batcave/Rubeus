@@ -43,7 +43,7 @@ jobs:
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: |
        msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform="Any CPU" ${{env.SOLUTION_FILE_PATH}} /p:OutputPath=compiled/
-       Copy-Item -Path ${{env.NAME_BATGADGET}}\${{env.NAME_BATGADGET}}\compiled\${{env.NAME_BATGADGET}}.exe -Destination compiled\${{env.NAME_BATGADGET}}.exe
+       echo ${{env.GITHUB_WORKSPACE}}
 
     - name: Package Stuff
       working-directory: ${{env.GITHUB_WORKSPACE}}
