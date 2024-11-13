@@ -18,6 +18,8 @@ env:
   # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
   BUILD_CONFIGURATION: Release
 
+  NAME_BATGADGET: rubeus
+
 permissions:
   contents: read
 
@@ -39,4 +41,34 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform="Any CPU" ${{env.SOLUTION_FILE_PATH}}
+      run: |
+       msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform="Any CPU" ${{env.SOLUTION_FILE_PATH}}
+       Copy-Item -Path Rubeus\compiled\Rubeus.exe -Destination compiled\Rubeus.exe
+
+    - name: Package Stuff
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+        cd compiled
+        ls
+        tar.exe -czvf ..\${{NAME_BATGADGET}}.tar.gz .
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+  
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: .${{NAME_BATGADGET}}.tar.gz
+        asset_name: ${{NAME_BATGADGET}}.tar.gz
+        asset_content_type: application/gzip
