@@ -8,7 +8,6 @@ name: MSBuild
 on:
   push:
     tags: ["v[0-9]+.[0-9]+.[0-9]+"]
-    branches: ["master"]
 
 permissions:
   contents: write
@@ -50,7 +49,7 @@ jobs:
       run: |
         cd ${{env.NAME_BATGADGET}}/compiled
         ls
-        tar.exe -czvf ..\..\${{env.NAME_BATGADGET}}.tar.gz .
+        Compress-Archive -Path ${{env.NAME_BATGADGET}}/compiled/${{env.NAME_BATGADGET}}.exe -DestinationPath ../../${{ env.NAME_BATGADGET }}.zip
 
     - name: Create Release
       id: create_release
@@ -69,6 +68,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{env.NAME_BATGADGET}}.tar.gz
-        asset_name: ${{env.NAME_BATGADGET}}.tar.gz
-        asset_content_type: application/gzip
+        asset_path: ${{env.NAME_BATGADGET}}.zip
+        asset_name: ${{env.NAME_BATGADGET}}.zip
+        asset_content_type: application/zip
