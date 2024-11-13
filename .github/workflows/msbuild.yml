@@ -47,7 +47,7 @@ jobs:
     - name: Package Stuff
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: |
-        cd ${{env.GITHUB_WORKSPACE}}/compiled
+        cd ${{env.NAME_BATGADGET}}/compiled
         ls
         tar.exe -czvf ..\..\${{env.NAME_BATGADGET}}.tar.gz .
 
