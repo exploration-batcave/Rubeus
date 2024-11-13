@@ -42,7 +42,7 @@ jobs:
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: |
-       msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform="Any CPU" ${{env.SOLUTION_FILE_PATH}} /p:OutputPath=${{env.GITHUB_WORKSPACE}}/compiled/
+       msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform="Any CPU" ${{env.SOLUTION_FILE_PATH}} /p:OutDir=${{env.GITHUB_WORKSPACE}}/compiled/
 
     - name: Package Stuff
       working-directory: ${{env.GITHUB_WORKSPACE}}
