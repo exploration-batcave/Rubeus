@@ -1,13 +1,9 @@
 ﻿using System;
-using Asn1;
-using System.Text;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Rubeus.lib.Interop;
 
 
-namespace Rubeus
-{
+namespace Rubeus {
     public class Interop
     {
         // constants
@@ -141,7 +137,7 @@ namespace Rubeus
             rc4_hmac_exp = 24,
             subkey_keymaterial = 65,
             old_exp = -135,
-            credGuard_blob = -180
+            aes256_gcm_ghash_credguard = -180
         }
 
         [Flags]
@@ -260,14 +256,18 @@ namespace Rubeus
             PK_AS_09_BINDING = 132,
             CLIENT_CANONICALIZED = 133,
             KEY_LIST_REQ = 161,
-            KEY_LIST_REP = 162
+            KEY_LIST_REP = 162,
+            SUPERSEDED_BY_USER = 170,
+            DMSA_KEY_PACKAGE = 171
         }
 
         // from https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-sfu/cd9d5ca7-ce20-4693-872b-2f5dd41cbff6
         public enum PA_S4U_X509_USER_OPTIONS : Int32
         {
             CHECK_LOGON_RESTRICTIONS = 0x40000000,
-            SIGN_REPLY = 0x20000000
+            SIGN_REPLY = 0x20000000,
+            NT_AUTH_POLICY_NOT_REQUIRED = 0x10000000,
+            UNCONDITIONAL_DELEGATION = 0x08000000
         }
 
         [Flags]
@@ -958,6 +958,11 @@ namespace Rubeus
             public UInt16 Length;
             public UInt16 MaximumLength;
             public string Buffer;
+            public LSA_STRING_IN(string value) {
+                Length = (ushort)value.Length;
+                MaximumLength = (ushort)(value.Length + 1);
+                Buffer = value;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]

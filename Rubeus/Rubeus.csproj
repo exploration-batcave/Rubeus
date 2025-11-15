@@ -135,6 +135,8 @@
     <Compile Include="lib\krb_structures\Authenticator.cs" />
     <Compile Include="lib\krb_structures\AuthorizationData.cs" />
     <Compile Include="lib\krb_structures\Checksum.cs" />
+    <Compile Include="lib\krb_structures\PA_DMSA_KEY_PACKAGE.cs" />
+    <Compile Include="lib\krb_structures\PA_SUPERSEDED_BY_USER.cs" />
     <Compile Include="lib\krb_structures\PA_KEY_LIST_REP.cs" />
     <Compile Include="lib\krb_structures\EncryptedPAData.cs" />
     <Compile Include="lib\krb_structures\EncKDCRepPart.cs" />
@@ -144,6 +146,7 @@
     <Compile Include="lib\krb_structures\EncryptionKey.cs" />
     <Compile Include="lib\krb_structures\EncTicketPart.cs" />
     <Compile Include="lib\krb_structures\ETYPE_INFO2_ENTRY.cs" />
+    <Compile Include="lib\krb_structures\ETYPE_INFO_ENTRY.cs" />
     <Compile Include="lib\krb_structures\HostAddress.cs" />
     <Compile Include="lib\krb_structures\KDC_PROXY_MESSAGE.cs" />
     <Compile Include="lib\krb_structures\KDC_REQ_BODY.cs" />
@@ -244,4 +247,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+
 </Project>
