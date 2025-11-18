@@ -40,14 +40,14 @@ jobs:
     - name: Install .net framework SDK
       shell: pwsh
       run: |
-          echo "download ${env:NETSDKURL}"
-          Invoke-WebRequest -Uri "${env:NETSDLURK}" -OutFile "${env:temp}/netsdk.zip"
+          echo "download ${{env.NETSDKURL}}"
+          Invoke-WebRequest -Uri "${{env.NETSDLURK}}" -OutFile "${env:temp}/netsdk.zip"
           echo "unzip netsdk.zip"
           Expand-Archive -Force -LiteralPath "${env:temp}/netsdk.zip" -DestinationPath "${env:temp}/netsdk"
-          echo "delete ${env:SDKSYSTEMPATH}/${env:NETVERSION}'
-          [IO.Directory]::Delete("${env:SDKSYSTEMPATH}/${env:NETVERSION}", $True)
-          echo "move SDK to ${env:sdkSystemPath}/${env:NETVERSION}"
-          Move-Item -Force -LiteralPath "${env:temp}/netsdk/build/.NETFramework/${env:NETVERSION}" -Destination "${env:SDKSYSTEMPATH}"
+          echo "delete ${{env.SDKSYSTEMPATH}}/${{envr.NETVERSION}}'
+          [IO.Directory]::Delete("${{env.SDKSYSTEMPATH}}/${{env.NETVERSION}}", $True)
+          echo "move SDK to ${{env.SDKSYSTEMPATH}}/${{env.NETVERSION}}"
+          Move-Item -Force -LiteralPath "${env:temp}/netsdk/build/.NETFramework/${{env.NETVERSION}}" -Destination "${{env.SDKSYSTEMPATH}}"
 
 
     - name: Restore NuGet packages
