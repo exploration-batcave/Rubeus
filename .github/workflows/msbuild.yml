@@ -21,9 +21,9 @@ env:
   # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
   BUILD_CONFIGURATION: Release
 
-  NETSDKURL: 'https://www.nuget.org/api/v2/package/Microsoft.NETFramework.ReferenceAssemblies.net45/1.0.3'
+  NETSDKURL: 'https://www.nuget.org/api/v2/package/Microsoft.NETFramework.ReferenceAssemblies.net40/1.0.3'
   SDKSYSTEMPATH: 'C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework'
-  NETVERSION: v4.5 
+  NETVERSION: v4.0
 
   NAME_BATGADGET: Rubeus
 
