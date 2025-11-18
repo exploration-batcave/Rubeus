@@ -44,10 +44,11 @@ jobs:
         Invoke-WebRequest -Uri "${{env.NETSDKURL}}" -OutFile "${env:temp}/netsdk.zip"
         echo "unzip netsdk.zip"
         Expand-Archive -Force -LiteralPath "${env:temp}/netsdk.zip" -DestinationPath "${env:temp}/netsdk"
-        echo "delete ${{env.SDKSYSTEMPATH}}/${{env.NETVERSION}}'
-        [IO.Directory]::Delete("${{env.SDKSYSTEMPATH}}/${{env.NETVERSION}}", $True)
-        echo "move SDK to ${{env.SDKSYSTEMPATH}}/${{env.NETVERSION}}"
-        Move-Item -Force -LiteralPath "${env:temp}/netsdk/build/.NETFramework/${{env.NETVERSION}}" -Destination "${{env.SDKSYSTEMPATH}}"
+        echo "delete ${{env.SDKSYSTEMPATH}}\${{env.NETVERSION}}"
+        [IO.Directory]::Delete("${{env.SDKSYSTEMPATH}}\${{env.NETVERSION}}", $True)
+        echo "move SDK to ${{env.SDKSYSTEMPATH}}\${{env.NETVERSION}}"
+        Move-Item -Force -LiteralPath "${env:temp}/netsdk/build/.NETFramework/${{env.NETVERSION}}" -Destination "${{env.SDKSYSTEMPATH}}\${{env.NETVERSION}}"
+
 
 
     - name: Restore NuGet packages
